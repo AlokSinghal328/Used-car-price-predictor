@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./static/style.css">
+</head>
+<body>
+    <div class="main">
+        <div class="card-media">
+            <img src="https://img.freepik.com/free-vector/price-concept-illustration_114360-4683.jpg?t=st=1725885836~exp=1725889436~hmac=4bf1f5d4fd928b8b5367ce2253438ffe6e7ce8d0160691b3515003ee5e8a36be&w=740" alt="#" class="vect-img" >
+
+        </div>
+        <div class="card">
+            
+        <h1 class="card_header">
+            Welcome to car price predictor
+        </h1>
+        <div class="card_body">
+            <form method="post" accept-charset="UTF-8">
+                <div class="card_elem">
+                    <label for="company"><b class="label_text">Select Company: </b></label>
+                <select name="company" id="company" required = '1' onchange="load_car_models(this.id, 'car_model')" class="drop-down">
+                    {%for company in companies %}
+
+                        <option value="{{ company }}">{{ company }}</option>
+                    {% endfor %}
+
+                </select>
+                </div>
+                <div class="card_elem">
+                    <label for="car_model"><b class="label_text">Select Model: </b></label>
+                <select name="car_model" id="car_model" required = '1' class="drop-down">
+                    {%for model in car_models %}
+
+                        <option value="{{ company }}">{{ company }}</option>
+                    {% endfor %}
+
+                </select>
+                </div>
+                <div class="card_elem">
+                    <label for="year"><b class="label_text">Select year of purchase: </b></label>
+                <select name="year" id="year" required = '1' class="drop-down">
+                    {%for year in years %}
+
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+
+                </select>
+                </div>
+                <div class="card_elem">
+                    <label for="fuel_type"><b class="label_text">Select fuel type: </b></label>
+                <select name="fuel_type" id="fuel_type" required = '1' class="drop-down">
+
+                    {%for fuel in fuel_type %}
+
+                        <option value="{{ fuel }}">{{ fuel }}</option>
+                    {% endfor %}
+                </select>
+                </div>
+                <div class="card_elem">
+                    <label for="kilo_driven"><b class="label_text">Enter no. of kilometer: </b></label>
+                    <input type="text" id="kilo_driven" name="kilo_driven" placeholder="Enter no. of kilometer:" class="drop-down">
+                </div>
+                <div class="card_button">
+                    <div class="card_elem-btn">
+                        <button onclick="send_data()">Predict price</button>
+                    </div>
+                    <div class="card_elem-btn">
+                        <button onclick="window.location.reload()">Restart</button>
+                    </div>
+                </div>
+                
+            </form >
+        </div>
+        <div class="result">
+            <h3><span id="prediction"></span></h3>
+        </div>
+        </div>
+        
+       
+    </div>
+
+
+
+    <script>
+
+        function load_car_models(company_id, car_model_id){
+            var company = document.getElementById(company_id);
+            var car_model = document.getElementById(car_model_id);
+            console.log(company.value);
+            car_model.value="";
+            car_model.innerHTML="";
+            
+                {% for company in companies %}
+                 if(company.value == "{{ company }}"){
+                    {% for model in car_models %}
+                     {% if company in model %}
+                        var newOption = document.createElement("option");
+                        newOption.value = "{{ model }}";
+                        newOption.innerHTML = "{{ model }}";
+                        car_model.options.add(newOption);
+                     {% endif %}
+                    {% endfor %}
+                 }
+                {% endfor %}
+        }
+
+
+        function form_handler(event){
+            event.preventDefault();
+        }
+        function send_data(){
+            document.querySelector('form').addEventListener('submit', form_handler);
+
+            var fd = new FormData(document.querySelector('form'));
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/predict', true);
+            document.getElementById('prediction').innerHTML='wait! predicting price...';
+
+            xhr.onreadystatechange  = function(){
+                if(xhr.readyState == XMLHttpRequest.DONE){
+                    document.getElementById("prediction").innerHTML='The price of the car: ₹' + xhr.responseText;
+                }
+            }
+
+            xhr.onload = function(){};
+            xhr.send(fd);
+        }
+    </script>
+</body>
+</html>
